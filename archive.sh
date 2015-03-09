@@ -11,7 +11,7 @@ for file in youtube-* vimeo-* channel9-*; do
   [ ! -d "${subdir}" ] && mkdir -p "${subdir}"
 
   if [ -e "${file}" ]; then
-      new_name=$(echo ${file} | sed -e "s|${service}-||" -e "s|${user}-||")
+      new_name=$(echo ${file} | sed -e "s|${service}-||" -e "s|${user}-||" -e "s|NA-||" -e "s|-NA||")
       echo mv "${file}" "${subdir}/${new_name}"
       mv "${file}" "${subdir}"
   fi
