@@ -2,18 +2,18 @@
 .DEFAULT: all
 VIDEOPLAYER=open -a vlc
 PLEXSCANNER=/Applications/Plex\ Media\ Server.app/Contents/MacOS/Plex\ Media\ Scanner
-
-all: download watch
+FIND=find . -type f -name "*.mp4" -o -name "*.flv" -o -name "*.wmv"
+all: download plex
 
 plex: archive diff
 	diff before after > /dev/null 2>&1 && false || true
 	$(PLEXSCANNER) --scan --refresh --force --section 3
 
 before:
-	find . -type f -name "*.mp4" -o -name "*.flv" -o -name "*.wmv" > before
+	$(FIND) > before
 
 after:
-	find . -type f -name "*.mp4" -o -name "*.flv" -o -name "*.wmv" > after
+	$(FIND) > after
 
 diff: after
 
@@ -22,7 +22,7 @@ watch: archive diff
 	$(VIDEOPLAYER) $(shell diff before after | grep '>' | sed -e 's|\> ||g')
 
 download: before
-	-youtube-dl --ignore-errors --no-overwrites --continue --output "%(extractor)s-%(upload_date)s-%(uploader)s-%(title)s-%(id)s.%(ext)s" --batch-file urls --youtube-skip-dash-manifest --restrict-filenames --download-archive archive --format best --no-part
+	-youtube-dl --ignore-errors --no-overwrites --continue --output "%(extractor)s-%(upload_date)s-%(uploader)s-%(title)s-%(id)s.%(ext)s" --batch-file urls --restrict-filenames --download-archive archive --format best --no-part
 
 archive:
 	./archive.sh
